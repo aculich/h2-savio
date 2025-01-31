@@ -1,0 +1,5 @@
+#!/bin/bash
+
+chgrp -R fc_winerev /global/home/groups/fc_winerev
+find /global/home/groups/fc_winerev -type d -exec chmod g+o,g+s {} +
+find /global/home/groups/fc_winerev -type f -exec chmod g+o,g+rw {} +
