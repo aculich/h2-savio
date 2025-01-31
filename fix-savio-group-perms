@@ -31,3 +31,8 @@ find "$GROUP_DIR" -type f -exec chmod g+o,g+rw {} +
 
 # Provide feedback that the script completed successfully
 echo "Successfully configured permissions for group: $GROUP_NAME"
+
+## The script above is a generalized version of these 3 commands:
+# chgrp -R fc_winerev /global/home/groups/fc_winerev
+# find /global/home/groups/fc_winerev -type d -exec chmod g+o,g+s {} +
+# find /global/home/groups/fc_winerev -type f -exec chmod g+o,g+rw {} +
