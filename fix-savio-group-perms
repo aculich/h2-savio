@@ -1,5 +1,33 @@
 #!/bin/bash
 
-chgrp -R fc_winerev /global/home/groups/fc_winerev
-find /global/home/groups/fc_winerev -type d -exec chmod g+o,g+s {} +
-find /global/home/groups/fc_winerev -type f -exec chmod g+o,g+rw {} +
+# Default to 'fc_winerev' if no group name is provided as an argument
+# Usage: ./fix-savio-group-perms [group_name]
+GROUP_NAME=${1:-fc_winerev}
+
+# Construct the full path to the group's directory
+# All faculty computing (fc_*) groups are located in /global/home/groups/
+GROUP_DIR="/global/home/groups/${GROUP_NAME}"
+
+# Verify the group directory exists before proceeding
+# Exit with error if directory is not found
+if [ ! -d "$GROUP_DIR" ]; then
+    echo "Error: Directory $GROUP_DIR does not exist"
+    exit 1
+fi
+
+# Recursively change group ownership of all files and directories
+# This ensures everything in the directory belongs to the specified group
+chgrp -R "$GROUP_NAME" "$GROUP_DIR"
+
+# For all directories: 
+# - g+o: Give group members same permissions as owner
+# - g+s: Set SGID bit so new files inherit the group
+find "$GROUP_DIR" -type d -exec chmod g+o,g+s {} +
+
+# For all files:
+# - g+o: Give group members same permissions as owner
+# - g+rw: Ensure group members can read and write all files
+find "$GROUP_DIR" -type f -exec chmod g+o,g+rw {} +
+
+# Provide feedback that the script completed successfully
+echo "Successfully configured permissions for group: $GROUP_NAME"
