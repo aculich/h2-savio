@@ -14,6 +14,69 @@ These commands are configuring the directory `/global/home/groups/fc_winerev` on
 the Savio HPC cluster for a faculty condo group called `fc_winerev`. Below is a
 breakdown of what each command does and why it’s useful for collaborative work.
 
+--
+
+## **Graphic Representation of Unix File Permissions**  
+Below is a visual representation of a common Unix file permission mode, similar to the style in your attached screenshot.  
+
+### **Visual Representation of `rwx rwx rwx` (Octal: `777`)**  
+
+![image](https://github.com/user-attachments/assets/ca6dd013-064e-491f-ae03-c3e7e474f96f)
+
+Taken from: [Day 6: File Permissions and Access Control Lists🐧](url)
+
+---
+
+## **Table 1: Unix File Permissions Breakdown**  
+This table shows the basic Unix file permissions in octal notation, their corresponding symbolic representation, and what they mean.  
+
+| **Octal** | **String Representation** | **Permissions** |
+|---------|----------------------|--------------------|
+| **0**  | --- | No Permission |
+| **1**  | --x | Execute |
+| **2**  | -w- | Write |
+| **3**  | -wx | Write + Execute |
+| **4**  | r-- | Read |
+| **5**  | r-x | Read + Execute |
+| **6**  | rw- | Read + Write |
+| **7**  | rwx | Read + Write + Execute |
+
+---
+
+## **Table 2: Common Unix File and Directory Modes**  
+This table lists common octal permission modes for files and directories, explaining their usage.  
+
+| **Mode (Octal Representation)** | **Description** |
+|--------------------------------|------------------------------|
+| **000** | No permissions for anyone |
+| **644** | Regular file: owner can read/write, others can only read |
+| **600** | Private file: only owner can read/write |
+| **666** | All users can read/write (not recommended) |
+| **755** | Executable file: owner can read/write/execute, others can read/execute |
+| **700** | Private executable file: only owner can read/write/execute |
+| **777** | Full access (read/write/execute) for everyone (not recommended) |
+| **700** | Private directory: only owner can access |
+| **750** | Directory accessible by owner and group |
+| **755** | Public directory: owner can write, others can read/execute |
+
+---
+
+## **Table 3: Special 4-Digit Octal Permissions**  
+These are special permission modes using four-digit octal values, including **SetUID, SetGID, and the Sticky Bit**.  
+
+| **Mode (Octal Representation)** | **Description** |
+|--------------------------------|------------------------------|
+| **1777** | Sticky bit: everyone can write, but only the owner can delete their own files (common for `/tmp`) |
+| **2755** | SetGID: Executable runs with the group’s permissions |
+| **2700** | Private directory with SetGID: only group members can access |
+| **4755** | SetUID: Executable runs with the owner’s permissions |
+| **4000** | SetUID: File executes as the file owner |
+| **2000** | SetGID: File executes as the group owner |
+| **1000** | Sticky bit: Restricts file deletion in shared directories |
+
+---
+
+
 🚀 Explanation of Each Command and Its Impact on an HPC Cluster Research Group
 
 ## 1. Change Group Ownership Recursively
