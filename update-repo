@@ -2,4 +2,4 @@
 
 # Pull from remote and force overwrite any local changes
 # The -X theirs strategy option tells git to automatically choose the remote version for any conflicts
-git pull -X theirs https://github.com/aculich/h2-savio/ 
+git pull -X theirs --hard https://github.com/aculich/h2-savio/
