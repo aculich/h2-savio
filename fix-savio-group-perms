@@ -28,7 +28,7 @@ progress_bar() {
 for DIR in "$GROUP_DIR" "$SCRATCH_DIR"; do
     if [ -d "$DIR" ]; then
         echo "Updating permissions for: $DIR"
-        
+
         # Get total number of files and directories
         total_items=$(find "$DIR" | wc -l)
         current=0
@@ -43,9 +43,10 @@ for DIR in "$GROUP_DIR" "$SCRATCH_DIR"; do
         # For all directories:
         # - g+o: Give group members same permissions as owner
         # - g+s: Set SGID bit so new files inherit the group
+        # - o-rwx: Remove write permissions for others
         current=0
         while IFS= read -r dir; do
-            chmod g+o,g+s "$dir" 2>/dev/null
+            chmod g+o,g+s,o-rwx "$dir" 2>/dev/null
             ((current++))
             progress_bar "$current"
         done < <(find "$DIR" -type d)
@@ -53,9 +54,10 @@ for DIR in "$GROUP_DIR" "$SCRATCH_DIR"; do
         # For all files:
         # - g+o: Give group members same permissions as owner
         # - g+rw: Ensure group members can read and write all files
+        # - o-rwx: Remove write permissions for others
         current=0
         while IFS= read -r file; do
-            chmod g+o,g+rw "$file" 2>/dev/null
+            chmod g+o,g+rw,o-rwx "$file" 2>/dev/null
             ((current++))
             progress_bar "$current"
         done < <(find "$DIR" -type f)
@@ -71,6 +73,6 @@ echo "Successfully updated permissions for group: $GROUP_NAME"
 
 ## The script above is a generalized version of these 3 commands:
 # chgrp -R fc_winerev /global/home/groups/fc_winerev
-# find /global/home/groups/fc_winerev -type d -exec chmod g+o,g+s {} +
-# find /global/home/groups/fc_winerev -type f -exec chmod g+o,g+rw {} +
+# find /global/home/groups/fc_winerev -type d -exec chmod g+u,g+s,o-rwx {} +
+# find /global/home/groups/fc_winerev -type f -exec chmod g+u,g+rw,o-rwx {} +
 
