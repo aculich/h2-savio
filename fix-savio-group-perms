@@ -7,7 +7,7 @@ GROUP_NAME=${1:-fc_winerev}
 # Construct the full path to the group's directory
 # All faculty computing (fc_*) groups are located in /global/home/groups/
 GROUP_DIR="/global/home/groups/${GROUP_NAME}"
-SCRATCH_DIR="$(readlink -f ${GROUP_DIR})"
+SCRATCH_DIR="$(readlink -f ${GROUP_DIR}/scratch)"
 
 # Verify the group directory exists before proceeding
 # Exit with error if directory is not found
