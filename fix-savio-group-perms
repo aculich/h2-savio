@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Updating file and directory permissions for: $USER"
+
 # Default to 'fc_winerev' if no group name is provided as an argument
 # Usage: ./fix-savio-group-perms [group_name]
 GROUP_NAME=${1:-fc_winerev}
@@ -16,22 +18,59 @@ if [ ! -d "$GROUP_DIR" ]; then
     exit 1
 fi
 
+# Function to display a progress bar
+progress_bar() {
+    local progress=$1
+    local total=$2
+    local bar_width=50
+    local percent=$((progress * 100 / total))
+    local filled_length=$((bar_width * progress / total))
+    
+    # Create the bar components
+    local bar=$(printf '%0.s#' $(seq 1 ${filled_length}))
+    local empty=$(printf '%0.s-' $(seq 1 $((bar_width - filled_length))))
+    
+    # Update the same line; note that this works best in an interactive terminal.
+    echo -ne "Progress: [${bar}${empty}] ${percent}%\r"
+}
+
 # Iterate over both directories and apply permissions
 for DIR in "$GROUP_DIR" "$SCRATCH_DIR"; do
     if [ -d "$DIR" ]; then
         echo "Updating permissions for: $DIR"
+        
+        # Get total number of files and directories
+        total_items=$(find "$DIR" | wc -l)
+        current=0
+        
         # Recursively change group ownership of all files and directories
-        chgrp -R "$GROUP_NAME" "$DIR" 2>/dev/null
+        while IFS= read -r item; do
+            chgrp "$GROUP_NAME" "$item" 2>/dev/null
+            ((current++))
+            progress_bar "$current" "$total_items"
+        done < <(find "$DIR")
 
         # For all directories:
         # - g+o: Give group members same permissions as owner
         # - g+s: Set SGID bit so new files inherit the group
-        find "$DIR" -type d -exec chmod g+o,g+s {} + 2>/dev/null
+        current=0
+        while IFS= read -r dir; do
+            chmod g+o,g+s "$dir" 2>/dev/null
+            ((current++))
+            progress_bar "$current" "$total_items"
+        done < <(find "$DIR" -type d)
 
         # For all files:
         # - g+o: Give group members same permissions as owner
         # - g+rw: Ensure group members can read and write all files
-        find "$DIR" -type f -exec chmod g+o,g+rw {} + 2>/dev/null
+        current=0
+        while IFS= read -r file; do
+            chmod g+o,g+rw "$file" 2>/dev/null
+            ((current++))
+            progress_bar "$current" "$total_items"
+        done < <(find "$DIR" -type f)
+        
+        echo # Add newline after progress bar
     else
         echo "Warning: Directory $DIR does not exist, skipping..."
     fi
@@ -44,3 +83,4 @@ echo "Successfully updated permissions for group: $GROUP_NAME"
 # chgrp -R fc_winerev /global/home/groups/fc_winerev
 # find /global/home/groups/fc_winerev -type d -exec chmod g+o,g+s {} +
 # find /global/home/groups/fc_winerev -type f -exec chmod g+o,g+rw {} +
+
