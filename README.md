@@ -26,6 +26,30 @@ Below is a visual representation of a common Unix file permission mode, similar 
 Taken from: [Day 6: File Permissions and Access Control Lists🐧](url)
 
 ---
+## **Table 0: Most Often Used Unix File and Directory Modes**  
+
+| **Octal** | **Mode**    | **Description** |
+|-----------|------------|------------------------------------------------------|
+| **644**   | rw-r--r--  | Regular file: owner can read/write, others can only read. Common for text files and configuration files. |
+| **600**   | rw-------  | Private file: only owner can read/write. Used for sensitive files like SSH keys (`~/.ssh/id_rsa`). |
+| **666**   | rw-rw-rw-  | World-writable file (not recommended). All users can read/write, but not execute. |
+| **755**   | rwxr-xr-x  | Executable file: owner can read/write/execute, others can read/execute. Used for scripts and binaries. |
+| **700**   | rwx------  | Private executable file: only owner can read/write/execute. Useful for private scripts. |
+| **700**   | rwx------  | Private directory: only owner can access. Used for home directories like `~/.ssh/`. |
+| **750**   | rwxr-x---  | Directory accessible by owner and group. Others have no access. |
+| **755**   | rwxr-xr-x  | Public directory: owner can write, others can read/execute. Common for web server directories (`/var/www/html`). |
+| **777**   | rwxrwxrwx  | Full access (not recommended). Everyone can read, write, and execute. Used temporarily for troubleshooting. |
+| **1777**  | rwxrwxrwt  | Sticky bit: everyone can write, but only the owner can delete their own files (common for `/tmp`). |
+| **2770**  | rwxrws---  | **(Recommended for research groups)**: Full read/write/execute access for the owner and group, but no access for others. The SetGID bit ensures that all newly created files inherit the group ownership of the directory. This is ideal for research groups collaborating on files, as it prevents accidental permission mismatches. |
+| **2775**  | rwxrwsr-x  | **(Alternative for mixed access teams)**: Similar to `2770`, but allows read and execute access for others, useful if non-group members need to browse the directory without modifying files. |
+
+### Why `2770` is ideal for research groups:
+- **Owner and group** can fully read, write, and execute files (`rwxrws---`).
+- **SetGID (s on group permissions)** ensures that **all new files inherit the group** automatically.
+- **Others have no access** (`---`), maintaining privacy for internal files.
+- This setup avoids the common problem of files being created with **wrong group ownership**, which can prevent collaboration.
+
+---
 
 ## **Table 1: Unix File Permissions Breakdown**  
 This table shows the basic Unix file permissions in octal notation, their corresponding symbolic representation, and what they mean.  
@@ -60,8 +84,6 @@ This table lists common octal permission modes for files and directories, explai
 | **755**   | rwxr-xr-x  | Public directory: owner can write, others can read/execute |
 
 ---
-
-Here is the **Markdown version** of Table 3, now including additional entries for an **ideal research group setup** with `rwxrws---`:
 
 ## **Table 3: Special Unix File and Directory Modes**  
 This table lists special octal permission modes, explaining their effects.
