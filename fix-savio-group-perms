@@ -7,6 +7,7 @@ GROUP_NAME=${1:-fc_winerev}
 # Construct the full path to the group's directory
 # All faculty computing (fc_*) groups are located in /global/home/groups/
 GROUP_DIR="/global/home/groups/${GROUP_NAME}"
+SCRATCH_DIR="${GROUP_NAME}/scratch/"
 
 # Verify the group directory exists before proceeding
 # Exit with error if directory is not found
@@ -15,22 +16,29 @@ if [ ! -d "$GROUP_DIR" ]; then
     exit 1
 fi
 
-# Recursively change group ownership of all files and directories
-# This ensures everything in the directory belongs to the specified group
-chgrp -R "$GROUP_NAME" "$GROUP_DIR"
+# Iterate over both directories and apply permissions
+for DIR in "$GROUP_DIR" "$SCRATCH_DIR"; do
+    if [ -d "$DIR" ]; then
+        echo "Updating permissions for: $DIR"
+        # Recursively change group ownership of all files and directories
+        chgrp -R "$GROUP_NAME" "$DIR" 2>/dev/null
 
-# For all directories: 
-# - g+o: Give group members same permissions as owner
-# - g+s: Set SGID bit so new files inherit the group
-find "$GROUP_DIR" -type d -exec chmod g+o,g+s {} +
+        # For all directories:
+        # - g+o: Give group members same permissions as owner
+        # - g+s: Set SGID bit so new files inherit the group
+        find "$DIR" -type d -exec chmod g+o,g+s {} + 2>/dev/null
 
-# For all files:
-# - g+o: Give group members same permissions as owner
-# - g+rw: Ensure group members can read and write all files
-find "$GROUP_DIR" -type f -exec chmod g+o,g+rw {} +
+        # For all files:
+        # - g+o: Give group members same permissions as owner
+        # - g+rw: Ensure group members can read and write all files
+        find "$DIR" -type f -exec chmod g+o,g+rw {} + 2>/dev/null
+    else
+        echo "Warning: Directory $DIR does not exist, skipping..."
+    fi
+done
 
 # Provide feedback that the script completed successfully
-echo "Successfully configured permissions for group: $GROUP_NAME"
+echo "Successfully updated permissions for group: $GROUP_NAME"
 
 ## The script above is a generalized version of these 3 commands:
 # chgrp -R fc_winerev /global/home/groups/fc_winerev
