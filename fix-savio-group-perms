@@ -23,15 +23,16 @@ progress_bar() {
     local progress=$1
     local total=$2
     local bar_width=50
-    local percent=$((progress * 100 / total))
+    # Use floating point arithmetic for more precise percentage
+    local percent=$(awk "BEGIN {printf \"%.1f\", ($progress * 100 / $total)}")
     local filled_length=$((bar_width * progress / total))
     
     # Create the bar components
     local bar=$(printf '%0.s#' $(seq 1 ${filled_length}))
     local empty=$(printf '%0.s-' $(seq 1 $((bar_width - filled_length))))
     
-    # Update the same line; note that this works best in an interactive terminal.
-    echo -ne "Progress: [${bar}${empty}] ${percent}%\r"
+    # Update the same line with consistent decimal formatting
+    echo -ne "Progress: [${bar}${empty}] ${percent}%%\r"
 }
 
 # Iterate over both directories and apply permissions
